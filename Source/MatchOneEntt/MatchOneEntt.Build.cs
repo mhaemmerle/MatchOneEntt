@@ -14,13 +14,7 @@ public class MatchOneEntt : ModuleRules
 
         PrivateDependencyModuleNames.AddRange(new string[] { });
 
-        var p = Path.Combine(ThirdPartyPath, "entt", "src", "entt");
-
-        Console.WriteLine("p " + p);
-
-        PublicIncludePaths.Add(p);
-
-        PublicIncludePaths.AddRange(new string[] { "../../ThirdParty/entt/src/entt" });
+        PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "entt", "src", "entt"));
     }
 
     private string ThirdPartyPath
