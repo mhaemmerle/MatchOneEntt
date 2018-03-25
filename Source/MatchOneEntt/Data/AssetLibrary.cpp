@@ -1,13 +1,12 @@
 #include "MatchOneEntt.h"
 #include "AssetLibrary.h"
 
-void AssetLibrary::Add(const std::string &Key, TSubclassOf<AGamePiece> Value)
+void AssetLibrary::Add(FName Key, TSubclassOf<AGamePiece> Value)
 {
-    Assets[Key] = Value;
+    Assets.Add(Key, Value);
 }
 
-TSubclassOf<AGamePiece> AssetLibrary::Get(const std::string &Key)
+TSubclassOf<AGamePiece> AssetLibrary::Get(FName Key)
 {
-    auto It = Assets.find(Key);
-    return It != Assets.end() ? It->second : nullptr;
+    return Assets.FindRef(Key);
 }

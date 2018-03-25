@@ -24,9 +24,7 @@ void AddViewSystem::Update(entt::DefaultRegistry &Registry)
         {
             auto &Asset = Registry.get<AssetComponent>(Entity);
 
-            auto AssetKey = std::string(TCHAR_TO_UTF8(*(Asset.Value.ToString())));
-
-            auto actor = World.Value->SpawnActor<AGamePiece>(AssetLibrary.Value->Get(AssetKey), FVector::ZeroVector, FRotator::ZeroRotator);
+            auto actor = World.Value->SpawnActor<AGamePiece>(AssetLibrary.Value->Get(Asset.Value), FVector::ZeroVector, FRotator::ZeroRotator);
             actor->AttachToActor(ViewContainer.Value, FAttachmentTransformRules::KeepRelativeTransform);
 
             auto renderComponent = actor->GetRenderComponent();

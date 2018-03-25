@@ -25,13 +25,13 @@ AMatchOneEnttPlayerController::AMatchOneEnttPlayerController()
     static ConstructorHelpers::FClassFinder<AGamePiece> GamePiece5BPClass(TEXT("/Game/GamePieces/GamePiece_5"));
 
     Assets = new AssetLibrary();
-    Assets->Add("Blocker", BlockerBPClass.Class);
-    Assets->Add("Piece0", GamePiece0BPClass.Class);
-    Assets->Add("Piece1", GamePiece1BPClass.Class);
-    Assets->Add("Piece2", GamePiece2BPClass.Class);
-    Assets->Add("Piece3", GamePiece3BPClass.Class);
-    Assets->Add("Piece4", GamePiece4BPClass.Class);
-    Assets->Add("Piece5", GamePiece5BPClass.Class);
+    Assets->Add(FName(TEXT("Blocker")), BlockerBPClass.Class);
+    Assets->Add(FName(TEXT("Piece0")), GamePiece0BPClass.Class);
+    Assets->Add(FName(TEXT("Piece1")), GamePiece1BPClass.Class);
+    Assets->Add(FName(TEXT("Piece2")), GamePiece2BPClass.Class);
+    Assets->Add(FName(TEXT("Piece3")), GamePiece3BPClass.Class);
+    Assets->Add(FName(TEXT("Piece4")), GamePiece4BPClass.Class);
+    Assets->Add(FName(TEXT("Piece5")), GamePiece5BPClass.Class);
 
     entt::ServiceLocator<entt::DefaultRegistry>::set();
 

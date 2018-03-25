@@ -1,14 +1,13 @@
 #pragma once
 
 #include "Game/Actors/GamePiece.h"
-#include <unordered_map>
 
 class AssetLibrary
 {
 public:
-    void Add(const std::string &Key, TSubclassOf<AGamePiece> Value);
-    TSubclassOf<AGamePiece> Get(const std::string &Key);
+    void Add(FName, TSubclassOf<AGamePiece> Value);
+    TSubclassOf<AGamePiece> Get(FName Key);
 
 private:
-    std::unordered_map<std::string, TSubclassOf<AGamePiece>> Assets;
+    TMap<FName, TSubclassOf<AGamePiece>> Assets;
 };
