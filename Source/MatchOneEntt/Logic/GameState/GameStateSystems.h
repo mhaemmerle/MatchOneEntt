@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Interfaces/Systems.h"
+#include "Extension/Feature.h"
 
-class GameStateSystems : public Systems
+class GameStateSystems : public Feature
 {
 public:
     GameStateSystems();

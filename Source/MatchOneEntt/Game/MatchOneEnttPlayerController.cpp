@@ -88,11 +88,6 @@ void AMatchOneEnttPlayerController::BeginDestroy()
     entt::ServiceLocator<entt::DefaultRegistry>::reset();
 }
 
-void AMatchOneEnttPlayerController::FinishDestroy()
-{
-    Super::FinishDestroy();
-}
-
 void AMatchOneEnttPlayerController::OnClick()
 {
     CheckHit();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interfaces/System.h"
+#include "Extension/System.h"
 
 class ScoreSystem : public System
 {

@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Interfaces/System.h"
-#include "Interfaces/Systems.h"
+#include "Extension/Feature.h"
 
-class ViewSystems : public Systems
+class ViewSystems : public Feature
 {
 public:
     ViewSystems();

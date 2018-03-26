@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Interfaces/System.h"
+#include "Extension/Feature.h"
 
-class DestroySystem : public System
+class DestroySystem : public Feature
 {
 public:
     virtual void Update(entt::DefaultRegistry &Registry) override;
