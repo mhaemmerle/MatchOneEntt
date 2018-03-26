@@ -22,7 +22,7 @@ void AddViewSystem::Update(entt::DefaultRegistry &Registry)
 
         for (auto Entity : View)
         {
-            auto &Asset = Registry.get<AssetComponent>(Entity);
+            auto &Asset = View.get(Entity);
 
             auto actor = World.Value->SpawnActor<AGamePiece>(AssetLibrary.Value->Get(Asset.Value), FVector::ZeroVector, FRotator::ZeroRotator);
             actor->AttachToActor(ViewContainer.Value, FAttachmentTransformRules::KeepRelativeTransform);

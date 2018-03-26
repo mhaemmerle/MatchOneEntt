@@ -28,10 +28,11 @@ void FallSystem::Update(entt::DefaultRegistry &Registry)
                 for (int Row = 1; Row < GameBoard.Rows; Row++)
                 {
                     auto CurrentPosition = FIntVector(Column, Row, 0);
+                    auto PositionView = Registry.persistent<PositionComponent, MovableComponent>();
 
-                    for (auto PositionEntity : Registry.persistent<PositionComponent, MovableComponent>())
+                    for (auto PositionEntity : PositionView)
                     {
-                        auto Position = Registry.get<PositionComponent>(PositionEntity);
+                        auto Position = PositionView.get<PositionComponent>(PositionEntity);
 
                         if (Position.Value == CurrentPosition)
                         {

@@ -18,7 +18,7 @@ void ProcessInputSystem::Update(entt::DefaultRegistry &Registry)
 
     for (auto Entity : View)
     {
-        auto UserInput = Registry.get<UserInputComponent>(Entity);
+        auto UserInput = View.get(Entity);
         auto InputPosition = FIntVector(UserInput.X, UserInput.Y, 0);
 
         auto PositionView = Registry.persistent<PositionComponent, InteractiveComponent>();

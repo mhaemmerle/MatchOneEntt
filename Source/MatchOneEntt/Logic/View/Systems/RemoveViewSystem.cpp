@@ -16,7 +16,7 @@ void RemoveViewSystem::Update(entt::DefaultRegistry &Registry)
 
     for (auto Entity : View)
     {
-        auto &ViewComp = Registry.get<ViewComponent>(Entity);
+        auto &ViewComp = View.get<ViewComponent>(Entity);
         ViewComp.Value->Destroy();
 
         //var gameObject = viewComponent.gameObject;

@@ -15,7 +15,7 @@ void ScoreListenerSystem::Update(entt::DefaultRegistry &Registry)
 
         for (auto ListenerEntity : ListenerView)
         {
-            auto ScoreListener = Registry.get<ScoreListenerComponent>(ListenerEntity);
+            auto ScoreListener = ListenerView.get(ListenerEntity);
             ScoreListener.Value->OnScore(Score.Value, Registry.attachee<ScoreComponent>());
         }
 
