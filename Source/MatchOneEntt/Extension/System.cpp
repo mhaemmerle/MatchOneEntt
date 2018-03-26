@@ -1,4 +1,3 @@
-#include "MatchOneEntt.h"
 #include "System.h"
 
 void System::Initialize(entt::DefaultRegistry &Registry) {}
