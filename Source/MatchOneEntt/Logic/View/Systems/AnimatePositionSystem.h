@@ -2,7 +2,7 @@
 
 #include "Interfaces/System.h"
 
-class AnimatePositionSystem : public ISystem, public IUpdateSystem
+class AnimatePositionSystem : public System
 {
 public:
     virtual void Update(entt::DefaultRegistry &Registry) override;

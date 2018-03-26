@@ -8,8 +8,6 @@ public class MatchOneEntt : ModuleRules
     {
         //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        bUseRTTI = true;
-
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Paper2D" });
 
         PrivateDependencyModuleNames.AddRange(new string[] { });

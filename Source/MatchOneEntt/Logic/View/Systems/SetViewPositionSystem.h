@@ -2,7 +2,7 @@
 
 #include "Interfaces/System.h"
 
-class SetViewPositionSystem : public ISystem, public IInitializeSystem, public IUpdateSystem
+class SetViewPositionSystem : public System
 {
 public:
     virtual void Initialize(entt::DefaultRegistry &Registry) override;

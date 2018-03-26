@@ -2,7 +2,7 @@
 
 #include "Interfaces/System.h"
 
-class GameBoardSystem : public ISystem, public IInitializeSystem, public IUpdateSystem
+class GameBoardSystem : public System
 {
 public:
     virtual void Initialize(entt::DefaultRegistry &Registry) override;

@@ -2,7 +2,7 @@
 
 #include "Interfaces/System.h"
 
-class ScoreSystem : public ISystem, public IInitializeSystem, public IUpdateSystem
+class ScoreSystem : public System
 {
 public:
     virtual void Initialize(entt::DefaultRegistry &Registry) override;

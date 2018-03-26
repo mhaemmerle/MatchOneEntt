@@ -2,7 +2,7 @@
 
 #include "Interfaces/System.h"
 
-class RemoveViewSystem : public ISystem, public IInitializeSystem, public IUpdateSystem
+class RemoveViewSystem : public System
 {
 public:
     virtual void Initialize(entt::DefaultRegistry &Registry) override;

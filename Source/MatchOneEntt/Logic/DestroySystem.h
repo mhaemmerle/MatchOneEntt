@@ -2,7 +2,7 @@
 
 #include "Interfaces/System.h"
 
-class DestroySystem : public ISystem, public IUpdateSystem
+class DestroySystem : public System
 {
 public:
     virtual void Update(entt::DefaultRegistry &Registry) override;

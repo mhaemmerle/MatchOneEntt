@@ -1,24 +1,16 @@
 #include "MatchOneEntt.h"
 #include "Systems.h"
 
-auto Systems::Add(std::shared_ptr<ISystem> System) -> Systems*
+auto Systems::Add(std::shared_ptr<System> System) -> Systems*
 {
-    if (std::dynamic_pointer_cast<IInitializeSystem>(System) != nullptr)
-    {
-        InitializeSystems.push_back(std::dynamic_pointer_cast<IInitializeSystem>(System));
-    }
-
-    if (std::dynamic_pointer_cast<IUpdateSystem>(System) != nullptr)
-    {
-        UpdateSystems.push_back(std::dynamic_pointer_cast<IUpdateSystem>(System));
-    }
+    mSystems.push_back(System);
 
     return this;
 }
 
 void Systems::Initialize(entt::DefaultRegistry &Registry)
 {
-    for (const auto &System : InitializeSystems)
+    for (const auto &System : mSystems)
     {
         System->Initialize(Registry);
     }
@@ -26,7 +18,7 @@ void Systems::Initialize(entt::DefaultRegistry &Registry)
 
 void Systems::Update(entt::DefaultRegistry &Registry)
 {
-    for (const auto &System : UpdateSystems)
+    for (const auto &System : mSystems)
     {
         System->Update(Registry);
     }

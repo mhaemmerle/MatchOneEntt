@@ -2,35 +2,16 @@
 
 #include "entt.hpp"
 
-class ISystem
+class System
 {
 protected:
-    ISystem() {};
-    ISystem(const ISystem&) = default;
-    ISystem& operator=(const ISystem&) = default;
+    System() {};
+    System(const System&) = default;
+    System& operator=(const System&) = default;
 
 public:
-    virtual ~ISystem() = default;
-};
+    virtual ~System() = default;
 
-class IInitializeSystem
-{
-protected:
-    IInitializeSystem() {};
-
-public:
-    virtual ~IInitializeSystem() = default;
-
-    virtual void Initialize(entt::DefaultRegistry &Registry) = 0;
-};
-
-class IUpdateSystem
-{
-protected:
-    IUpdateSystem() {};
-
-public:
-    virtual ~IUpdateSystem() = default;
-
-    virtual void Update(entt::DefaultRegistry &Registry) = 0;
+    virtual void Initialize(entt::DefaultRegistry &Registry);
+    virtual void Update(entt::DefaultRegistry &Registry);
 };

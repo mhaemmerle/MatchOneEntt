@@ -2,7 +2,7 @@
 
 #include "Interfaces/System.h"
 
-class ProcessInputSystem : public ISystem, public IInitializeSystem, public IUpdateSystem
+class ProcessInputSystem : public System
 {
 public:
     virtual void Initialize(entt::DefaultRegistry &Registry) override;
