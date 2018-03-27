@@ -5,5 +5,5 @@
 
 struct AssetLibraryComponent
 {
-    AssetLibrary* Value;
+    UAssetLibrary* Value;
 };

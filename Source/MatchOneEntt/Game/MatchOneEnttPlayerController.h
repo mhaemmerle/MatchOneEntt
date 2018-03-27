@@ -16,6 +16,9 @@ public:
     virtual void SetupInputComponent() override;
     virtual void Tick(float DeltaSeconds) override;
 
+    UFUNCTION(BlueprintCallable)
+        void SetAssetLibrary(UAssetLibrary* Assets);
+
     void OnClick();
     void OnPressedB();
 
@@ -26,6 +29,5 @@ protected:
 private:
     void CheckHit();
 
-    AssetLibrary* Assets;
     std::unique_ptr<GameSystems> Systems;
 };

@@ -1,13 +1,17 @@
 #pragma once
 
+#include "UObject/Object.h"
 #include "Game/Actors/GamePiece.h"
+#include "AssetLibrary.generated.h"
 
-class AssetLibrary
+UCLASS(Blueprintable, BlueprintType)
+class MATCHONEENTT_API UAssetLibrary : public UObject
 {
-public:
-    void Add(FName, TSubclassOf<AGamePiece> Value);
-    TSubclassOf<AGamePiece> Get(FName Key);
+    GENERATED_BODY()
 
-private:
-    TMap<FName, TSubclassOf<AGamePiece>> Assets;
+public:
+    UAssetLibrary(const FObjectInitializer& ObjectInitializer);
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+        TMap<FName, TSubclassOf<AGamePiece>> GamePieces;
 };

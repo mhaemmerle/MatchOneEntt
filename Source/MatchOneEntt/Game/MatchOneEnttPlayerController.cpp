@@ -15,23 +15,6 @@ AMatchOneEnttPlayerController::AMatchOneEnttPlayerController()
     bEnableClickEvents = true;
     bEnableMouseOverEvents = true;
 
-    static ConstructorHelpers::FClassFinder<AGamePiece> BlockerBPClass(TEXT("/Game/GamePieces/GamePiece_Blocker"));
-    static ConstructorHelpers::FClassFinder<AGamePiece> GamePiece0BPClass(TEXT("/Game/GamePieces/GamePiece_0"));
-    static ConstructorHelpers::FClassFinder<AGamePiece> GamePiece1BPClass(TEXT("/Game/GamePieces/GamePiece_1"));
-    static ConstructorHelpers::FClassFinder<AGamePiece> GamePiece2BPClass(TEXT("/Game/GamePieces/GamePiece_2"));
-    static ConstructorHelpers::FClassFinder<AGamePiece> GamePiece3BPClass(TEXT("/Game/GamePieces/GamePiece_3"));
-    static ConstructorHelpers::FClassFinder<AGamePiece> GamePiece4BPClass(TEXT("/Game/GamePieces/GamePiece_4"));
-    static ConstructorHelpers::FClassFinder<AGamePiece> GamePiece5BPClass(TEXT("/Game/GamePieces/GamePiece_5"));
-
-    Assets = new AssetLibrary();
-    Assets->Add(FName(TEXT("Blocker")), BlockerBPClass.Class);
-    Assets->Add(FName(TEXT("Piece0")), GamePiece0BPClass.Class);
-    Assets->Add(FName(TEXT("Piece1")), GamePiece1BPClass.Class);
-    Assets->Add(FName(TEXT("Piece2")), GamePiece2BPClass.Class);
-    Assets->Add(FName(TEXT("Piece3")), GamePiece3BPClass.Class);
-    Assets->Add(FName(TEXT("Piece4")), GamePiece4BPClass.Class);
-    Assets->Add(FName(TEXT("Piece5")), GamePiece5BPClass.Class);
-
     entt::ServiceLocator<entt::DefaultRegistry>::set();
 
     Systems = std::make_unique<GameSystems>();
@@ -58,7 +41,6 @@ void AMatchOneEnttPlayerController::BeginPlay()
 
     auto ViewContainer = GetWorld()->SpawnActor<AViewContainer>(AViewContainer::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
 
-    Registry.attach<AssetLibraryComponent>(Registry.create(), Assets);
     Registry.attach<ViewContainerComponent>(Registry.create(), ViewContainer);
     Registry.attach<WorldComponent>(Registry.create(), GetWorld());
 }
@@ -85,6 +67,12 @@ void AMatchOneEnttPlayerController::BeginDestroy()
     Super::BeginDestroy();
 
     entt::ServiceLocator<entt::DefaultRegistry>::reset();
+}
+
+void AMatchOneEnttPlayerController::SetAssetLibrary(UAssetLibrary* AssetLibrary)
+{
+    entt::DefaultRegistry &Registry = entt::ServiceLocator<entt::DefaultRegistry>::ref();
+    Registry.attach<AssetLibraryComponent>(Registry.create(), AssetLibrary);
 }
 
 void AMatchOneEnttPlayerController::OnClick()

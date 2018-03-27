@@ -45,7 +45,7 @@ public:
         int randomIndex = rand() % pieces.size();
 
         Registry.assign<PositionComponent>(Entity, FIntVector(X, Y, 0));
-        Registry.assign<AssetComponent>(Entity, std::move(pieces[randomIndex]));
+        Registry.assign<AssetComponent>(Entity, pieces[randomIndex]);
         Registry.assign<PositionUpdatedComponent>(Entity);
         Registry.assign<AddViewComponent>(Entity);
 
