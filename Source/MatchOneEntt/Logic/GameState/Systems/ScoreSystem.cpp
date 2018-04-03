@@ -14,10 +14,8 @@ void ScoreSystem::Update(entt::DefaultRegistry &Registry)
 
     for (auto Entity : View)
     {
-        auto ScoreEntity = Registry.attachee<ScoreComponent>();
-        auto Score = Registry.get<ScoreComponent>();
-
-        Registry.attach<ScoreComponent>(ScoreEntity, Score.Value + 1);
+        auto &Score = Registry.get<ScoreComponent>();
+        Score.Value = Score.Value + 1;
 
         Registry.destroy(Entity);
 
