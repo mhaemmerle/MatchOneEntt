@@ -113,7 +113,7 @@ class Registry {
     }
 
     template<typename Component>
-    Pool<Component> & __ensure__() {
+    Pool<Component> & assure() {
         const auto ctype = component_family::type<Component>();
 
         if(!(ctype < pools.size())) {
@@ -145,7 +145,7 @@ class Registry {
             }
 
             accumulator_type accumulator = {
-                (__ensure__<Component>().append(set.get(), &Registry::has<Component...>), 0)...
+                (assure<Component>().append(set.get(), &Registry::has<Component...>), 0)...
             };
 
             handlers[vtype] = std::move(set);
@@ -243,7 +243,7 @@ public:
      */
     template<typename Component>
     void reserve(size_type cap) {
-        __ensure__<Component>().reserve(cap);
+        assure<Component>().reserve(cap);
     }
 
     /**
@@ -374,7 +374,7 @@ public:
     entity_type create(Component &&... components) noexcept {
         using accumulator_type = int[];
         const auto entity = create();
-        accumulator_type accumulator = { 0, (__ensure__<std::decay_t<Component>>().construct(*this, entity, std::forward<Component>(components)), 0)... };
+        accumulator_type accumulator = { 0, (assure<std::decay_t<Component>>().construct(*this, entity, std::forward<Component>(components)), 0)... };
         (void)accumulator;
         return entity;
     }
@@ -401,7 +401,7 @@ public:
     entity_type create() noexcept {
         using accumulator_type = int[];
         const auto entity = create();
-        accumulator_type accumulator = { 0, (__ensure__<Component>().construct(*this, entity), 0)... };
+        accumulator_type accumulator = { 0, (assure<Component>().construct(*this, entity), 0)... };
         (void)accumulator;
         return entity;
     }
@@ -613,7 +613,7 @@ public:
     template<typename Component, typename... Args>
     Component & assign(entity_type entity, Args &&... args) {
         assert(valid(entity));
-        return __ensure__<Component>().construct(*this, entity, std::forward<Args>(args)...);
+        return assure<Component>().construct(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -792,7 +792,7 @@ public:
     template<typename Component, typename... Args>
     Component & accommodate(entity_type entity, Args &&... args) {
         assert(valid(entity));
-        auto &cpool = __ensure__<Component>();
+        auto &cpool = assure<Component>();
 
         return (cpool.has(entity)
                 ? (cpool.get(entity) = Component{std::forward<Args>(args)...})
@@ -824,7 +824,7 @@ public:
      */
     template<typename Component, typename Compare>
     void sort(Compare compare) {
-        __ensure__<Component>().sort(std::move(compare));
+        assure<Component>().sort(std::move(compare));
     }
 
     /**
@@ -859,7 +859,7 @@ public:
      */
     template<typename To, typename From>
     void sort() {
-        __ensure__<To>().respect(__ensure__<From>());
+        assure<To>().respect(assure<From>());
     }
 
     /**
@@ -1048,7 +1048,7 @@ public:
      */
     template<typename... Component>
     View<Entity, Component...> view() {
-        return View<Entity, Component...>{__ensure__<Component>()...};
+        return View<Entity, Component...>{assure<Component>()...};
     }
 
     /**
@@ -1180,7 +1180,7 @@ public:
      */
     template<typename Component>
     RawView<Entity, Component> raw() {
-        return RawView<Entity, Component>{__ensure__<Component>()};
+        return RawView<Entity, Component>{assure<Component>()};
     }
 
 
