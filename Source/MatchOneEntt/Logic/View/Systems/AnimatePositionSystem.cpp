@@ -4,23 +4,20 @@
 #include "Components/ViewComponent.h"
 #include "Components/GameBoardComponent.h"
 
-void AnimatePositionSystem::Initialize(entt::DefaultRegistry &Registry)
-{
-    Registry.prepare<PositionUpdatedComponent, PositionComponent, ViewComponent>();
-}
+void AnimatePositionSystem::Initialize(entt::registry& Registry) {}
 
-void AnimatePositionSystem::Update(entt::DefaultRegistry &Registry)
+void AnimatePositionSystem::Update(entt::registry& Registry)
 {
-    auto View = Registry.persistent<PositionUpdatedComponent, PositionComponent, ViewComponent>();
+    auto View = Registry.view<PositionUpdatedComponent, PositionComponent, ViewComponent>();
 
     if (View.size() > 0)
     {
-        auto GameBoard = Registry.get<GameBoardComponent>();
+        auto& GameBoard = Registry.ctx<GameBoardComponent>();
 
         for (auto Entity : View)
         {
-            auto &Position = View.get<PositionComponent>(Entity);
-            auto &ViewComp = View.get<ViewComponent>(Entity);
+            auto& Position = View.get<PositionComponent>(Entity);
+            auto& ViewComp = View.get<ViewComponent>(Entity);
 
             auto IsTopRow = Position.Value.Y == GameBoard.Rows - 1;
 

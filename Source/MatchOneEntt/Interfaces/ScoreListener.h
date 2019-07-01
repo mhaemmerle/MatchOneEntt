@@ -14,5 +14,5 @@ class MATCHONEENTT_API IScoreListener
     GENERATED_BODY()
 
 public:
-    virtual void OnScore(int32 Score, uint32_t Entity) = 0;
+    virtual void OnScore(int32 Score) = 0;
 };

@@ -4,14 +4,11 @@
 
 #include <memory>
 #include <utility>
-#include <cassert>
+#include "../config/config.h"
+#include "fwd.hpp"
 
 
 namespace entt {
-
-
-template<typename Resource>
-class ResourceCache;
 
 
 /**
@@ -27,24 +24,17 @@ class ResourceCache;
  * @tparam Resource Type of resource managed by a handle.
  */
 template<typename Resource>
-class ResourceHandle final {
+class resource_handle {
     /*! @brief Resource handles are friends of their caches. */
-    friend class ResourceCache<Resource>;
+    friend class resource_cache<Resource>;
 
-    ResourceHandle(std::shared_ptr<Resource> res) noexcept
+    resource_handle(std::shared_ptr<Resource> res) ENTT_NOEXCEPT
         : resource{std::move(res)}
     {}
 
 public:
-    /*! @brief Default copy constructor. */
-    ResourceHandle(const ResourceHandle &) noexcept = default;
-    /*! @brief Default move constructor. */
-    ResourceHandle(ResourceHandle &&) noexcept = default;
-
-    /*! @brief Default copy assignment operator. @return This handle. */
-    ResourceHandle & operator=(const ResourceHandle &) noexcept = default;
-    /*! @brief Default move assignment operator. @return This handle. */
-    ResourceHandle & operator=(ResourceHandle &&) noexcept = default;
+    /*! @brief Default constructor. */
+    resource_handle() ENTT_NOEXCEPT = default;
 
     /**
      * @brief Gets a reference to the managed resource.
@@ -56,35 +46,30 @@ public:
      *
      * @return A reference to the managed resource.
      */
-    const Resource & get() const noexcept {
-        assert(static_cast<bool>(resource));
+    const Resource & get() const ENTT_NOEXCEPT {
+        ENTT_ASSERT(static_cast<bool>(resource));
         return *resource;
     }
 
-    /**
-     * @brief Casts a handle and gets a reference to the managed resource.
-     *
-     * @warning
-     * The behavior is undefined if the handle doesn't contain a resource.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * handle is empty.
-     */
-    inline operator const Resource & () const noexcept { return get(); }
+    /*! @copydoc get */
+    Resource & get() ENTT_NOEXCEPT {
+        return const_cast<Resource &>(std::as_const(*this).get());
+    }
+
+    /*! @copydoc get */
+    operator const Resource & () const ENTT_NOEXCEPT { return get(); }
+
+    /*! @copydoc get */
+    operator Resource & () ENTT_NOEXCEPT { return get(); }
+
+    /*! @copydoc get */
+    const Resource & operator *() const ENTT_NOEXCEPT { return get(); }
+
+    /*! @copydoc get */
+    Resource & operator *() ENTT_NOEXCEPT { return get(); }
 
     /**
-     * @brief Dereferences a handle to obtain the managed resource.
-     *
-     * @warning
-     * The behavior is undefined if the handle doesn't contain a resource.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * handle is empty.
-     *
-     * @return A reference to the managed resource.
-     */
-    inline const Resource & operator *() const noexcept { return get(); }
-
-    /**
-     * @brief Gets a pointer to the managed resource from a handle .
+     * @brief Gets a pointer to the managed resource.
      *
      * @warning
      * The behavior is undefined if the handle doesn't contain a resource.<br/>
@@ -94,13 +79,19 @@ public:
      * @return A pointer to the managed resource or `nullptr` if the handle
      * contains no resource at all.
      */
-    inline const Resource * operator ->() const noexcept {
-        assert(static_cast<bool>(resource));
+    const Resource * operator->() const ENTT_NOEXCEPT {
+        ENTT_ASSERT(static_cast<bool>(resource));
         return resource.get();
     }
 
+    /*! @copydoc operator-> */
+    Resource * operator->() ENTT_NOEXCEPT {
+        return const_cast<Resource *>(std::as_const(*this).operator->());
+    }
+
     /**
-     * @brief Returns true if the handle contains a resource, false otherwise.
+     * @brief Returns true if a handle contains a resource, false otherwise.
+     * @return True if the handle contains a resource, false otherwise.
      */
     explicit operator bool() const { return static_cast<bool>(resource); }
 

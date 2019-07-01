@@ -3,19 +3,16 @@
 #include "Components/AddViewComponent.h"
 #include "Components/PositionComponent.h"
 
-void SetViewPositionSystem::Initialize(entt::DefaultRegistry &Registry)
-{
-    Registry.prepare<AddViewComponent, PositionComponent, ViewComponent>();
-}
+void SetViewPositionSystem::Initialize(entt::registry& Registry) {}
 
-void SetViewPositionSystem::Update(entt::DefaultRegistry &Registry)
+void SetViewPositionSystem::Update(entt::registry& Registry)
 {
-    auto View = Registry.persistent<AddViewComponent, PositionComponent, ViewComponent>();
+    auto View = Registry.view<AddViewComponent, PositionComponent, ViewComponent>();
 
     for (auto Entity : View)
     {
-        auto &Position = View.get<PositionComponent>(Entity);
-        auto &ViewComp = View.get<ViewComponent>(Entity);
+        auto& Position = View.get<PositionComponent>(Entity);
+        auto& ViewComp = View.get<ViewComponent>(Entity);
 
         auto X = 0.0f;
         auto Y = Position.Value.X * 125.0f;

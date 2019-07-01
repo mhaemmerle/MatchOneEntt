@@ -3,15 +3,11 @@
 #include "Components/DestroyedComponent.h"
 #include "Components/PositionComponent.h"
 #include "Components/InteractiveComponent.h"
-#include "Components/UpdateScoreComponent.h"
 #include "Data/Comparator.h"
 
-void ProcessInputSystem::Initialize(entt::DefaultRegistry &Registry)
-{
-    Registry.prepare<PositionComponent, InteractiveComponent>();
-}
+void ProcessInputSystem::Initialize(entt::registry& Registry) {}
 
-void ProcessInputSystem::Update(entt::DefaultRegistry &Registry)
+void ProcessInputSystem::Update(entt::registry& Registry)
 {
     auto View = Registry.view<UserInputComponent>();
 
@@ -20,7 +16,7 @@ void ProcessInputSystem::Update(entt::DefaultRegistry &Registry)
         auto UserInput = View.get(Entity);
         auto InputPosition = FIntVector(UserInput.X, UserInput.Y, 0);
 
-        auto PositionView = Registry.persistent<PositionComponent, InteractiveComponent>();
+        auto PositionView = Registry.view<PositionComponent, InteractiveComponent>();
 
         for (auto PositionEntity : PositionView)
         {
@@ -31,7 +27,6 @@ void ProcessInputSystem::Update(entt::DefaultRegistry &Registry)
                 if (Registry.has<DestroyedComponent>(PositionEntity) == false)
                 {
                     Registry.assign<DestroyedComponent>(PositionEntity);
-                    Registry.create<UpdateScoreComponent>();
                 }
             }
         }

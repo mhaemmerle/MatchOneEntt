@@ -14,7 +14,7 @@ public:
     virtual void DrawHUD() override;
 
 private:
-    void OnScore(int32 InScore, uint32_t Entity) override;
+    void OnScore(int32 InScore) override;
 
     int Score;
 };

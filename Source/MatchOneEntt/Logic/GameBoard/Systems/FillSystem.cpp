@@ -3,13 +3,13 @@
 #include "Components/GameBoardComponent.h"
 #include "Logic/GameBoard/GameBoardLogic.h"
 
-void FillSystem::Update(entt::DefaultRegistry &Registry)
+void FillSystem::Update(entt::registry& Registry)
 {
     auto View = Registry.view<FillEventComponent>();
 
     if (View.size() > 0)
     {
-        auto GameBoard = Registry.get<GameBoardComponent>();
+        auto GameBoard = Registry.ctx<GameBoardComponent>();
 
         for (auto Entity : View)
         {

@@ -1,23 +1,32 @@
 #include "ScoreListenerSystem.h"
-#include "Components/ScoreUpdatedComponent.h"
 #include "Components/ScoreComponent.h"
 #include "Components/ScoreListenerComponent.h"
 
-void ScoreListenerSystem::Update(entt::DefaultRegistry &Registry)
+void ScoreListenerSystem::Initialize(entt::registry& Registry)
 {
-    auto View = Registry.view<ScoreUpdatedComponent>();
+    Observer = MakeUnique<entt::observer>(Registry, entt::collector.replace<ScoreComponent>());
+}
+
+void ScoreListenerSystem::Update(entt::registry& Registry)
+{
     auto ListenerView = Registry.view<ScoreListenerComponent>();
 
-    for (auto Entity : View)
+    for (auto Entity : *Observer)
     {
-        auto Score = Registry.get<ScoreComponent>();
+        auto& Score = Registry.get<ScoreComponent>(Entity);
 
         for (auto ListenerEntity : ListenerView)
         {
-            auto ScoreListener = ListenerView.get(ListenerEntity);
-            ScoreListener.Value->OnScore(Score.Value, Registry.attachee<ScoreComponent>());
+            auto& ScoreListener = ListenerView.get(ListenerEntity);
+            ScoreListener.Value->OnScore(Score.Value);
         }
-
-        Registry.destroy(Entity);
     }
+
+    Observer->clear();
+}
+
+void ScoreListenerSystem::Teardown(entt::registry& Registry)
+{
+    Observer->clear();
+    Observer->disconnect();
 }

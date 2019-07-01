@@ -12,6 +12,7 @@ protected:
 public:
     virtual ~System() = default;
 
-    virtual void Initialize(entt::DefaultRegistry &Registry);
-    virtual void Update(entt::DefaultRegistry &Registry);
+    virtual void Initialize(entt::registry& Registry);
+    virtual void Update(entt::registry& Registry);
+    virtual void Teardown(entt::registry& Registry);
 };

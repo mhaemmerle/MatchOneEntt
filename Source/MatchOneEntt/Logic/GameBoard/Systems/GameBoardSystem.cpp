@@ -8,12 +8,11 @@
 #include "Components/FillEventComponent.h"
 #include "Components/FallEventComponent.h"
 
-void GameBoardSystem::Initialize(entt::DefaultRegistry &Registry)
+void GameBoardSystem::Initialize(entt::registry& Registry)
 {
-    Registry.prepare<GameBoardElementComponent, PositionComponent>();
+    Registry.set<GameBoardComponent>(8, 9);
 
-    Registry.attach<GameBoardComponent>(Registry.create(), 8, 9);
-    auto GameBoard = Registry.get<GameBoardComponent>();
+    auto& GameBoard = Registry.ctx<GameBoardComponent>();
 
     for (int row = 0; row < GameBoard.Rows; row++)
     {
@@ -35,17 +34,17 @@ void GameBoardSystem::Initialize(entt::DefaultRegistry &Registry)
     Registry.create<GameBoardUpdateComponent>();
 }
 
-void GameBoardSystem::Update(entt::DefaultRegistry &Registry)
+void GameBoardSystem::Update(entt::registry& Registry)
 {
     auto GameBoardUpdateView = Registry.view<GameBoardUpdateComponent>();
 
     if (GameBoardUpdateView.size() > 0)
     {
-        auto GameBoard = Registry.get<GameBoardComponent>();
+        auto& GameBoard = Registry.ctx<GameBoardComponent>();
 
         for (auto GameBoardUpdateEntity : GameBoardUpdateView)
         {
-            auto ElementView = Registry.persistent<GameBoardElementComponent, PositionComponent>();
+            auto ElementView = Registry.view<GameBoardElementComponent, PositionComponent>();
 
             for (auto Entity : ElementView)
             {

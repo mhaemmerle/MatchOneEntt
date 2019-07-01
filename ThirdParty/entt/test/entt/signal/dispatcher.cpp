@@ -1,47 +1,53 @@
-#include <memory>
+#include <type_traits>
 #include <gtest/gtest.h>
+#include <entt/core/type_traits.hpp>
 #include <entt/signal/dispatcher.hpp>
 
-struct Event {};
+struct an_event {};
+struct another_event {};
+struct one_more_event {};
 
-struct Receiver {
-    void receive(const Event &) { ++cnt; }
+ENTT_NAMED_TYPE(an_event)
+
+struct receiver {
+    void receive(const an_event &) { ++cnt; }
     void reset() { cnt = 0; }
-    std::size_t cnt{0};
+    int cnt{0};
 };
 
-template<typename Dispatcher, typename Rec>
-void testDispatcher(Rec receiver) {
-    Dispatcher dispatcher;
+TEST(Dispatcher, Functionalities) {
+    entt::dispatcher dispatcher;
+    receiver receiver;
 
-    dispatcher.template connect<Event>(receiver);
-    dispatcher.template trigger<Event>();
-    dispatcher.template enqueue<Event>();
+    dispatcher.trigger<one_more_event>();
+    dispatcher.enqueue<one_more_event>();
+    dispatcher.update<one_more_event>();
 
-    ASSERT_EQ(receiver->cnt, static_cast<decltype(receiver->cnt)>(1));
+    dispatcher.sink<an_event>().connect<&receiver::receive>(&receiver);
+    dispatcher.trigger<an_event>();
+    dispatcher.enqueue<an_event>();
 
+    ASSERT_EQ(receiver.cnt, 1);
+
+    dispatcher.enqueue<another_event>();
+    dispatcher.update<another_event>();
+
+    ASSERT_EQ(receiver.cnt, 1);
+
+    dispatcher.update<an_event>();
+    dispatcher.trigger<an_event>();
+
+    ASSERT_EQ(receiver.cnt, 3);
+
+    receiver.reset();
+
+    an_event event{};
+
+    dispatcher.sink<an_event>().disconnect<&receiver::receive>(&receiver);
+    dispatcher.trigger<an_event>();
+    dispatcher.enqueue(event);
     dispatcher.update();
-    dispatcher.update();
-    dispatcher.template trigger<Event>();
+    dispatcher.trigger(std::as_const(event));
 
-    ASSERT_EQ(receiver->cnt, static_cast<decltype(receiver->cnt)>(3));
-
-    receiver->reset();
-
-    dispatcher.template disconnect<Event>(receiver);
-    dispatcher.template trigger<Event>();
-    dispatcher.template enqueue<Event>();
-    dispatcher.update();
-    dispatcher.template trigger<Event>();
-
-    ASSERT_EQ(receiver->cnt, static_cast<decltype(receiver->cnt)>(0));
-}
-
-TEST(ManagedDispatcher, Basics) {
-    testDispatcher<entt::ManagedDispatcher>(std::make_shared<Receiver>());
-}
-
-TEST(UnmanagedDispatcher, Basics) {
-    auto ptr = std::make_unique<Receiver>();
-    testDispatcher<entt::UnmanagedDispatcher>(ptr.get());
+    ASSERT_EQ(receiver.cnt, 0);
 }

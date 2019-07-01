@@ -1,22 +1,22 @@
 #include <gtest/gtest.h>
 #include <entt/core/family.hpp>
 
-using my_family = entt::Family<struct MyFamily>;
-using your_family = entt::Family<struct YourFamily>;
+using a_family = entt::family<struct a_family_type>;
+using another_family = entt::family<struct another_family_type>;
 
 TEST(Family, Functionalities) {
-    auto myFamilyType = my_family::type<struct MyFamilyType>();
-    auto mySameFamilyType = my_family::type<struct MyFamilyType>();
-    auto myOtherFamilyType = my_family::type<struct MyOtherFamilyType>();
-    auto yourFamilyType = your_family::type<struct YourFamilyType>();
+    auto t1 = a_family::type<int>;
+    auto t2 = a_family::type<int>;
+    auto t3 = a_family::type<char>;
+    auto t4 = another_family::type<double>;
 
-    ASSERT_EQ(myFamilyType, mySameFamilyType);
-    ASSERT_NE(myFamilyType, myOtherFamilyType);
-    ASSERT_EQ(myFamilyType, yourFamilyType);
+    ASSERT_EQ(t1, t2);
+    ASSERT_NE(t1, t3);
+    ASSERT_EQ(t1, t4);
 }
 
 TEST(Family, Uniqueness) {
-    ASSERT_EQ(my_family::type<int>(), my_family::type<int &>());
-    ASSERT_EQ(my_family::type<int>(), my_family::type<int &&>());
-    ASSERT_EQ(my_family::type<int>(), my_family::type<const int &>());
+    ASSERT_EQ(a_family::type<int>, a_family::type<int &>);
+    ASSERT_EQ(a_family::type<int>, a_family::type<int &&>);
+    ASSERT_EQ(a_family::type<int>, a_family::type<const int &>);
 }

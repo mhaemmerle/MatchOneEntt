@@ -3,7 +3,7 @@
 #include "Components/FillEventComponent.h"
 #include "Components/FallEventComponent.h"
 
-void DestroySystem::Update(entt::DefaultRegistry &Registry)
+void DestroySystem::Update(entt::registry& Registry)
 {
     auto View = Registry.view<DestroyedComponent>();
 

@@ -4,8 +4,10 @@
 #include "Components/AssetLibraryComponent.h"
 #include "Components/WorldComponent.h"
 #include "Components/ViewContainerComponent.h"
+#include "Components/ScoreListenerComponent.h"
 #include "Game/Actors/GamePiece.h"
 #include "Game/Actors/ViewContainer.h"
+#include "Game/MatchOneEnttHUD.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/World.h"
 
@@ -15,9 +17,8 @@ AMatchOneEnttPlayerController::AMatchOneEnttPlayerController()
     bEnableClickEvents = true;
     bEnableMouseOverEvents = true;
 
-    entt::ServiceLocator<entt::DefaultRegistry>::set();
-
-    Systems = std::make_unique<GameSystems>();
+    Registry = MakeShared<entt::registry>();
+    Systems = MakeUnique<GameSystems>();
 }
 
 void AMatchOneEnttPlayerController::SetupInputComponent()
@@ -35,44 +36,44 @@ void AMatchOneEnttPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
-    entt::DefaultRegistry &Registry = entt::ServiceLocator<entt::DefaultRegistry>::ref();
+    auto Entity = Registry->create();
+    Registry->assign<ScoreListenerComponent>(Entity, Cast<AMatchOneEnttHUD>(GetHUD()));
 
-    Systems->Initialize(Registry);
+    Systems->Initialize(Registry.ToSharedRef().Get());
 
     auto ViewContainer = GetWorld()->SpawnActor<AViewContainer>(AViewContainer::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
 
-    Registry.attach<ViewContainerComponent>(Registry.create(), ViewContainer);
-    Registry.attach<WorldComponent>(Registry.create(), GetWorld());
+    Registry->set<ViewContainerComponent>(ViewContainer);
+    Registry->set<WorldComponent>(GetWorld());
+}
+
+void AMatchOneEnttPlayerController::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
+
+    Systems->Teardown(Registry.ToSharedRef().Get());
+
+    Registry->reset();
 }
 
 void AMatchOneEnttPlayerController::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
-    entt::DefaultRegistry &Registry = entt::ServiceLocator<entt::DefaultRegistry>::ref();
-
     if (IsInputKeyDown(EKeys::LeftMouseButton))
     {
-        if (Registry.has<BurstModeComponent>())
+        if (auto BurstMode = Registry->try_ctx<BurstModeComponent>())
         {
             CheckHit();
         }
     }
 
-    Systems->Update(Registry);
-}
-
-void AMatchOneEnttPlayerController::BeginDestroy()
-{
-    Super::BeginDestroy();
-
-    entt::ServiceLocator<entt::DefaultRegistry>::reset();
+    Systems->Update(Registry.ToSharedRef().Get());
 }
 
 void AMatchOneEnttPlayerController::SetAssetLibrary(UAssetLibrary* AssetLibrary)
 {
-    entt::DefaultRegistry &Registry = entt::ServiceLocator<entt::DefaultRegistry>::ref();
-    Registry.attach<AssetLibraryComponent>(Registry.create(), AssetLibrary);
+    Registry->set<AssetLibraryComponent>(AssetLibrary);
 }
 
 void AMatchOneEnttPlayerController::OnClick()
@@ -82,15 +83,13 @@ void AMatchOneEnttPlayerController::OnClick()
 
 void AMatchOneEnttPlayerController::OnPressedB()
 {
-    entt::DefaultRegistry &Registry = entt::ServiceLocator<entt::DefaultRegistry>::ref();
-
-    if (Registry.has<BurstModeComponent>())
+    if (auto BurstMode = Registry->try_ctx<BurstModeComponent>())
     {
-        Registry.remove<BurstModeComponent>();
+        Registry->unset<BurstModeComponent>();
     }
     else
     {
-        Registry.attach<BurstModeComponent>(Registry.create());
+        Registry->set<BurstModeComponent>();
     }
 }
 
@@ -113,8 +112,8 @@ void AMatchOneEnttPlayerController::CheckHit()
         {
             auto Location = GamePiece->GetActorLocation();
 
-            entt::DefaultRegistry &Registry = entt::ServiceLocator<entt::DefaultRegistry>::ref();
-            Registry.create(UserInputComponent{ int(Location.Y / 125.0f), int(Location.Z / 125.0f) });
+            auto Entity = Registry->create();
+            Registry->assign<UserInputComponent>(Entity, int(Location.Y / 125.0f), int(Location.Z / 125.0f));
         }
     }
 }

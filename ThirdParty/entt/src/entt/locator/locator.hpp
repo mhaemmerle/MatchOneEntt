@@ -4,7 +4,7 @@
 
 #include <memory>
 #include <utility>
-#include <cassert>
+#include "../config/config.h"
 
 
 namespace entt {
@@ -22,20 +22,20 @@ namespace entt {
  * @tparam Service Type of service managed by the locator.
  */
 template<typename Service>
-struct ServiceLocator final {
+struct service_locator {
     /*! @brief Type of service offered. */
     using service_type = Service;
 
     /*! @brief Default constructor, deleted on purpose. */
-    ServiceLocator() = delete;
+    service_locator() = delete;
     /*! @brief Default destructor, deleted on purpose. */
-    ~ServiceLocator() = delete;
+    ~service_locator() = delete;
 
     /**
      * @brief Tests if a valid service implementation is set.
      * @return True if the service is set, false otherwise.
      */
-    inline static bool empty() noexcept {
+    static bool empty() ENTT_NOEXCEPT {
         return !static_cast<bool>(service);
     }
 
@@ -49,7 +49,7 @@ struct ServiceLocator final {
      *
      * @return A reference to the service implementation currently set, if any.
      */
-    inline static std::weak_ptr<Service> get() noexcept {
+    static std::weak_ptr<Service> get() ENTT_NOEXCEPT {
         return service;
     }
 
@@ -67,7 +67,7 @@ struct ServiceLocator final {
      *
      * @return A reference to the service implementation currently set, if any.
      */
-    inline static Service & ref() noexcept {
+    static Service & ref() ENTT_NOEXCEPT {
         return *service;
     }
 
@@ -78,7 +78,7 @@ struct ServiceLocator final {
      * @param args Parameters to use to construct the service.
      */
     template<typename Impl = Service, typename... Args>
-    inline static void set(Args &&... args) {
+    static void set(Args &&... args) {
         service = std::make_shared<Impl>(std::forward<Args>(args)...);
     }
 
@@ -86,8 +86,8 @@ struct ServiceLocator final {
      * @brief Sets or replaces a service.
      * @param ptr Service to use to replace the current one.
      */
-    inline static void set(std::shared_ptr<Service> ptr) {
-        assert(static_cast<bool>(ptr));
+    static void set(std::shared_ptr<Service> ptr) {
+        ENTT_ASSERT(static_cast<bool>(ptr));
         service = std::move(ptr);
     }
 
@@ -96,17 +96,13 @@ struct ServiceLocator final {
      *
      * The service is no longer valid after a reset.
      */
-    inline static void reset() {
+    static void reset() {
         service.reset();
     }
 
 private:
-    static std::shared_ptr<Service> service;
+    inline static std::shared_ptr<Service> service = nullptr;
 };
-
-
-template<typename Service>
-std::shared_ptr<Service> ServiceLocator<Service>::service{};
 
 
 }

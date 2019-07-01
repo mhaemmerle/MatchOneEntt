@@ -2,107 +2,129 @@
 # Tests configuration
 #
 
+include_directories($<TARGET_PROPERTY:EnTT,INTERFACE_INCLUDE_DIRECTORIES>)
+add_compile_options($<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_OPTIONS>)
+
+macro(SETUP_LIBRARY_TARGET LIB_TARGET)
+    set_target_properties(${LIB_TARGET} PROPERTIES CXX_EXTENSIONS OFF)
+    target_compile_definitions(${LIB_TARGET} PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_DEFINITIONS>)
+    target_compile_features(${LIB_TARGET} PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_FEATURES>)
+    target_compile_options(${LIB_TARGET} PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -Wall>)
+    target_compile_options(${LIB_TARGET} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/EHsc>)
+endmacro()
+
 add_library(odr OBJECT odr.cpp)
+SETUP_LIBRARY_TARGET(odr)
+
+macro(SETUP_AND_ADD_TEST TEST_NAME TEST_SOURCE)
+    add_executable(${TEST_NAME} $<TARGET_OBJECTS:odr> ${TEST_SOURCE})
+    set_target_properties(${TEST_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+    target_link_libraries(${TEST_NAME} PRIVATE EnTT GTest::Main Threads::Threads)
+    target_compile_definitions(${TEST_NAME} PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_DEFINITIONS>)
+    target_compile_features(${TEST_NAME} PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_FEATURES>)
+    target_compile_options(${TEST_NAME} PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -Wall>)
+    target_compile_options(${TEST_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/EHsc>)
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+endmacro()
 
 # Test benchmark
 
 if(BUILD_BENCHMARK)
-    add_executable(
-        benchmark
-        $<TARGET_OBJECTS:odr>
-        benchmark/benchmark.cpp
-    )
-    target_link_libraries(benchmark PRIVATE gtest_main Threads::Threads)
-    add_test(NAME benchmark COMMAND benchmark)
+    SETUP_AND_ADD_TEST(benchmark benchmark/benchmark.cpp)
+endif()
+
+# Test lib
+
+if(BUILD_LIB)
+    add_library(a_module_shared SHARED lib/a_module.cpp)
+    add_library(a_module_static STATIC lib/a_module.cpp)
+    add_library(another_module_shared SHARED lib/another_module.cpp)
+    add_library(another_module_static STATIC lib/another_module.cpp)
+
+    SETUP_LIBRARY_TARGET(a_module_shared)
+    SETUP_LIBRARY_TARGET(a_module_static)
+    SETUP_LIBRARY_TARGET(another_module_shared)
+    SETUP_LIBRARY_TARGET(another_module_static)
+
+    SETUP_AND_ADD_TEST(lib_shared lib/lib.cpp)
+    target_link_libraries(lib_shared PRIVATE a_module_shared another_module_shared)
+
+    SETUP_AND_ADD_TEST(lib_static lib/lib.cpp)
+    target_link_libraries(lib_static PRIVATE a_module_static another_module_static)
 endif()
 
 # Test mod
 
 if(BUILD_MOD)
-    set(DUKTAPE_DEPS_DIR ${entt_SOURCE_DIR}/deps/duktape)
-    configure_file(${entt_SOURCE_DIR}/cmake/in/duktape.in ${DUKTAPE_DEPS_DIR}/CMakeLists.txt)
+    set(DUKTAPE_DEPS_DIR ${EnTT_SOURCE_DIR}/deps/duktape)
+    configure_file(${EnTT_SOURCE_DIR}/cmake/in/duktape.in ${DUKTAPE_DEPS_DIR}/CMakeLists.txt)
     execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY ${DUKTAPE_DEPS_DIR})
     execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${DUKTAPE_DEPS_DIR})
     set(DUKTAPE_SRC_DIR ${DUKTAPE_DEPS_DIR}/src/src)
 
-    add_executable(
-        mod
-        $<TARGET_OBJECTS:odr>
-        ${DUKTAPE_SRC_DIR}/duktape.c
-        mod/mod.cpp
-    )
+    set(MOD_TEST_SOURCE ${DUKTAPE_SRC_DIR}/duktape.c mod/mod.cpp)
+    SETUP_AND_ADD_TEST(mod "${MOD_TEST_SOURCE}")
     target_include_directories(mod PRIVATE ${DUKTAPE_SRC_DIR})
-    target_link_libraries(mod PRIVATE gtest_main Threads::Threads m)
-    add_test(NAME mod COMMAND mod)
+endif()
+
+# Test snapshot
+
+if(BUILD_SNAPSHOT)
+    set(CEREAL_DEPS_DIR ${EnTT_SOURCE_DIR}/deps/cereal)
+    configure_file(${EnTT_SOURCE_DIR}/cmake/in/cereal.in ${CEREAL_DEPS_DIR}/CMakeLists.txt)
+    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY ${CEREAL_DEPS_DIR})
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${CEREAL_DEPS_DIR})
+    set(CEREAL_SRC_DIR ${CEREAL_DEPS_DIR}/src/include)
+
+    SETUP_AND_ADD_TEST(cereal snapshot/snapshot.cpp)
+    target_include_directories(cereal PRIVATE ${CEREAL_SRC_DIR})
 endif()
 
 # Test core
 
-add_executable(
-    core
-    $<TARGET_OBJECTS:odr>
-    entt/core/family.cpp
-    entt/core/hashed_string.cpp
-    entt/core/ident.cpp
-)
-target_link_libraries(core PRIVATE gtest_main Threads::Threads)
-add_test(NAME core COMMAND core)
+SETUP_AND_ADD_TEST(algorithm entt/core/algorithm.cpp)
+SETUP_AND_ADD_TEST(family entt/core/family.cpp)
+SETUP_AND_ADD_TEST(hashed_string entt/core/hashed_string.cpp)
+SETUP_AND_ADD_TEST(ident entt/core/ident.cpp)
+SETUP_AND_ADD_TEST(monostate entt/core/monostate.cpp)
+SETUP_AND_ADD_TEST(type_traits entt/core/type_traits.cpp)
+SETUP_AND_ADD_TEST(utility entt/core/utility.cpp)
 
 # Test entity
 
-add_executable(
-    entity
-    $<TARGET_OBJECTS:odr>
-    entt/entity/actor.cpp
-    entt/entity/registry.cpp
-    entt/entity/sparse_set.cpp
-    entt/entity/view.cpp
-)
-target_link_libraries(entity PRIVATE gtest_main Threads::Threads)
-add_test(NAME entity COMMAND entity)
+SETUP_AND_ADD_TEST(actor entt/entity/actor.cpp)
+SETUP_AND_ADD_TEST(entity entt/entity/entity.cpp)
+SETUP_AND_ADD_TEST(group entt/entity/group.cpp)
+SETUP_AND_ADD_TEST(helper entt/entity/helper.cpp)
+SETUP_AND_ADD_TEST(observer entt/entity/observer.cpp)
+SETUP_AND_ADD_TEST(prototype entt/entity/prototype.cpp)
+SETUP_AND_ADD_TEST(registry entt/entity/registry.cpp)
+SETUP_AND_ADD_TEST(runtime_view entt/entity/runtime_view.cpp)
+SETUP_AND_ADD_TEST(snapshot entt/entity/snapshot.cpp)
+SETUP_AND_ADD_TEST(sparse_set entt/entity/sparse_set.cpp)
+SETUP_AND_ADD_TEST(storage entt/entity/storage.cpp)
+SETUP_AND_ADD_TEST(view entt/entity/view.cpp)
 
 # Test locator
 
-add_executable(
-    locator
-    $<TARGET_OBJECTS:odr>
-    entt/locator/locator.cpp
-)
-target_link_libraries(locator PRIVATE gtest_main Threads::Threads)
-add_test(NAME locator COMMAND locator)
+SETUP_AND_ADD_TEST(locator entt/locator/locator.cpp)
+
+# Test meta
+
+SETUP_AND_ADD_TEST(meta entt/meta/meta.cpp)
 
 # Test process
 
-add_executable(
-    process
-    $<TARGET_OBJECTS:odr>
-    entt/process/process.cpp
-    entt/process/scheduler.cpp
-)
-target_link_libraries(process PRIVATE gtest_main Threads::Threads)
-add_test(NAME process COMMAND process)
+SETUP_AND_ADD_TEST(process entt/process/process.cpp)
+SETUP_AND_ADD_TEST(scheduler entt/process/scheduler.cpp)
 
 # Test resource
 
-add_executable(
-    resource
-    $<TARGET_OBJECTS:odr>
-    entt/resource/resource.cpp
-)
-target_link_libraries(resource PRIVATE gtest_main Threads::Threads)
-add_test(NAME resource COMMAND resource)
+SETUP_AND_ADD_TEST(resource entt/resource/resource.cpp)
 
 # Test signal
 
-add_executable(
-    signal
-    $<TARGET_OBJECTS:odr>
-    entt/signal/bus.cpp
-    entt/signal/delegate.cpp
-    entt/signal/dispatcher.cpp
-    entt/signal/emitter.cpp
-    entt/signal/sigh.cpp
-    entt/signal/signal.cpp
-)
-target_link_libraries(signal PRIVATE gtest_main Threads::Threads)
-add_test(NAME signal COMMAND signal)
+SETUP_AND_ADD_TEST(delegate entt/signal/delegate.cpp)
+SETUP_AND_ADD_TEST(dispatcher entt/signal/dispatcher.cpp)
+SETUP_AND_ADD_TEST(emitter entt/signal/emitter.cpp)
+SETUP_AND_ADD_TEST(sigh entt/signal/sigh.cpp)

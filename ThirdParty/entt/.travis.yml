@@ -2,15 +2,40 @@ language: cpp
 dist: trusty
 sudo: false
 
+env:
+  global:
+    - CONAN_USERNAME="skypjack"
+    - CONAN_PACKAGE_NAME="entt"
+    - CONAN_HEADER_ONLY="True"
+    - NON_CONAN_DEPLOYMENT="True"
+
+conan-buildsteps: &conan-buildsteps
+  before_install:
+    # use this step if you desire to manipulate CONAN variables programmatically
+    - NON_CONAN_DEPLOYMENT="False"
+  install:
+    - chmod +x ./conan/ci/install.sh
+    - ./conan/ci/install.sh
+  script:
+    - chmod +x ./conan/ci/build.sh
+    - ./conan/ci/build.sh
+  # the following are dummies to overwrite default build steps
+  before_script:
+    - true
+  after_success:
+    - true
+  if: tag IS present
+conan-linux: &conan-linux
+  os: linux
+  sudo: required
+  language: python
+  python: "3.6"
+  services:
+    - docker
+  <<: *conan-buildsteps
+
 matrix:
   include:
-  - os: linux
-    compiler: gcc
-    addons:
-      apt:
-        sources: ['ubuntu-toolchain-r-test']
-        packages: ['g++-6']
-    env: COMPILER=g++-6
   - os: linux
     compiler: gcc
     addons:
@@ -22,22 +47,11 @@ matrix:
     compiler: clang
     addons:
       apt:
-        sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-4.0']
-        packages: ['clang-4.0', 'libstdc++-4.9-dev']
-    env: COMPILER=clang++-4.0
-  - os: linux
-    compiler: clang
-    addons:
-      apt:
-        sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-5.0']
-        packages: ['clang-5.0', 'libstdc++-4.9-dev']
-    env: COMPILER=clang++-5.0
+        sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-6.0']
+        packages: ['clang-6.0', 'g++-7']
+    env: COMPILER=clang++-6.0
   - os: osx
-    osx_image: xcode8.3
-    compiler: clang
-    env: COMPILER=clang++
-  - os: osx
-    osx_image: xcode9.1
+    osx_image: xcode10
     compiler: clang
     env: COMPILER=clang++
   - os: linux
@@ -53,6 +67,9 @@ matrix:
       - pip install --user cpp-coveralls
     after_success:
       - coveralls --gcov gcov-7 --gcov-options '\-lp' --root ${TRAVIS_BUILD_DIR} --build-root ${TRAVIS_BUILD_DIR}/build --extension cpp --extension hpp --exclude deps --include src
+  # Conan testing and uploading
+  - <<: *conan-linux
+    env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8
 
 notifications:
   email:
@@ -69,5 +86,12 @@ install:
 
 script:
 - mkdir -p build && cd build
-- cmake .. && make -j4
-- CTEST_OUTPUT_ON_FAILURE=1 make test
+- cmake -DBUILD_TESTING=ON -DBUILD_LIB=ON .. && make -j4
+- CTEST_OUTPUT_ON_FAILURE=1 ctest --timeout 5 -C Debug -j4
+
+deploy:
+  provider: script
+  script: scripts/update_packages.sh $TRAVIS_TAG
+  on:
+    tags: true
+    condition: “$NON_CONAN_DEPLOYMENT = “True”

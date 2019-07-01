@@ -9,19 +9,19 @@
 #include "Game/Actors/ViewContainer.h"
 #include "Data/AssetLibrary.h"
 
-void AddViewSystem::Update(entt::DefaultRegistry &Registry)
+void AddViewSystem::Update(entt::registry& Registry)
 {
     auto View = Registry.view<AssetComponent>();
 
     if (View.size() > 0)
     {
-        auto &World = Registry.get<WorldComponent>();
-        auto &ViewContainer = Registry.get<ViewContainerComponent>();
-        auto &AssetLibrary = Registry.get<AssetLibraryComponent>();
+        auto& World = Registry.ctx<WorldComponent>();
+        auto& ViewContainer = Registry.ctx<ViewContainerComponent>();
+        auto& AssetLibrary = Registry.ctx<AssetLibraryComponent>();
 
         for (auto Entity : View)
         {
-            auto &Asset = View.get(Entity);
+            auto& Asset = View.get(Entity);
             auto GamePieceClass = AssetLibrary.Value->GamePieces.FindRef(Asset.Value);
 
             auto actor = World.Value->SpawnActor<AGamePiece>(GamePieceClass, FVector::ZeroVector, FRotator::ZeroRotator);

@@ -24,10 +24,11 @@ public:
 
 protected:
     virtual void BeginPlay() override;
-    virtual void BeginDestroy() override;
+    virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 private:
     void CheckHit();
 
-    std::unique_ptr<GameSystems> Systems;
+    TSharedPtr<entt::registry> Registry;
+    TUniquePtr<GameSystems> Systems;
 };

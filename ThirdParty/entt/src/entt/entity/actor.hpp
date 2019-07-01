@@ -2,8 +2,13 @@
 #define ENTT_ENTITY_ACTOR_HPP
 
 
+#include <cassert>
 #include <utility>
+#include <type_traits>
+#include "../config/config.h"
 #include "registry.hpp"
+#include "entity.hpp"
+#include "fwd.hpp"
 
 
 namespace entt {
@@ -16,39 +21,67 @@ namespace entt {
  * with entity-component systems and prefer to iterate objects directly.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Delta Type to use to provide elapsed time.
  */
-template<typename Entity, typename Delta>
-struct Actor {
+template<typename Entity>
+struct basic_actor {
     /*! @brief Type of registry used internally. */
-    using registry_type = Registry<Entity>;
+    using registry_type = basic_registry<Entity>;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
-    /*! @brief Type used to provide elapsed time. */
-    using delta_type = Delta;
+
+    basic_actor() ENTT_NOEXCEPT
+        : reg{nullptr}, entt{entt::null}
+    {}
 
     /**
      * @brief Constructs an actor by using the given registry.
-     * @param reg An entity-component system properly initialized.
+     * @param ref An entity-component system properly initialized.
      */
-    Actor(Registry<Entity> &reg)
-        : reg{reg}, entity{reg.create()}
+    explicit basic_actor(registry_type &ref)
+        : reg{&ref}, entt{ref.create()}
     {}
 
     /*! @brief Default destructor. */
-    virtual ~Actor() {
-        reg.destroy(entity);
+    virtual ~basic_actor() {
+        if(*this) {
+            reg->destroy(entt);
+        }
     }
 
-    /*! @brief Default copy constructor. */
-    Actor(const Actor &) = default;
-    /*! @brief Default move constructor. */
-    Actor(Actor &&) = default;
+    /**
+     * @brief Move constructor.
+     *
+     * After actor move construction, instances that have been moved from are
+     * placed in a valid but unspecified state. It's highly discouraged to
+     * continue using them.
+     *
+     * @param other The instance to move from.
+     */
+    basic_actor(basic_actor &&other)
+        : reg{other.reg}, entt{other.entt}
+    {
+        other.entt = null;
+    }
 
-    /*! @brief Default copy assignment operator. @return This actor. */
-    Actor & operator=(const Actor &) = default;
-    /*! @brief Default move assignment operator. @return This actor. */
-    Actor & operator=(Actor &&) = default;
+    /**
+     * @brief Move assignment operator.
+     *
+     * After actor move assignment, instances that have been moved from are
+     * placed in a valid but unspecified state. It's highly discouraged to
+     * continue using them.
+     *
+     * @param other The instance to move from.
+     * @return This actor.
+     */
+    basic_actor & operator=(basic_actor &&other) {
+        if(this != &other) {
+            auto tmp{std::move(other)};
+            std::swap(reg, tmp.reg);
+            std::swap(entt, tmp.entt);
+        }
+
+        return *this;
+    }
 
     /**
      * @brief Assigns the given component to an actor.
@@ -65,8 +98,8 @@ struct Actor {
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    Component & set(Args &&... args) {
-        return reg.template accommodate<Component>(entity, std::forward<Args>(args)...);
+    decltype(auto) assign(Args &&... args) {
+        return reg->template assign_or_replace<Component>(entt, std::forward<Args>(args)...);
     }
 
     /**
@@ -74,8 +107,8 @@ struct Actor {
      * @tparam Component Type of the component to remove.
      */
     template<typename Component>
-    void unset() {
-        reg.template remove<Component>(entity);
+    void remove() {
+        reg->template remove<Component>(entt);
     }
 
     /**
@@ -84,68 +117,75 @@ struct Actor {
      * @return True if the actor has the component, false otherwise.
      */
     template<typename Component>
-    bool has() const noexcept {
-        return reg.template has<Component>(entity);
+    bool has() const ENTT_NOEXCEPT {
+        return reg->template has<Component>(entt);
     }
 
     /**
-     * @brief Returns a reference to the given component for an actor.
-     * @tparam Component Type of the component to get.
-     * @return A reference to the instance of the component owned by the entity.
+     * @brief Returns references to the given components for an actor.
+     * @tparam Component Types of components to get.
+     * @return References to the components owned by the actor.
      */
-    template<typename Component>
-    const Component & get() const noexcept {
-        return reg.template get<Component>(entity);
+    template<typename... Component>
+    decltype(auto) get() const ENTT_NOEXCEPT {
+        return std::as_const(*reg).template get<Component...>(entt);
+    }
+
+    /*! @copydoc get */
+    template<typename... Component>
+    decltype(auto) get() ENTT_NOEXCEPT {
+        return reg->template get<Component...>(entt);
     }
 
     /**
-     * @brief Returns a reference to the given component for an actor.
-     * @tparam Component Type of the component to get.
-     * @return A reference to the instance of the component owned by the entity.
+     * @brief Returns pointers to the given components for an actor.
+     * @tparam Component Types of components to get.
+     * @return Pointers to the components owned by the actor.
      */
-    template<typename Component>
-    Component & get() noexcept {
-        return const_cast<Component &>(const_cast<const Actor *>(this)->get<Component>());
+    template<typename... Component>
+    auto try_get() const ENTT_NOEXCEPT {
+        return std::as_const(*reg).template try_get<Component...>(entt);
+    }
+
+    /*! @copydoc try_get */
+    template<typename... Component>
+    auto try_get() ENTT_NOEXCEPT {
+        return reg->template try_get<Component...>(entt);
     }
 
     /**
      * @brief Returns a reference to the underlying registry.
-     * @return A reference to the underlying registry
+     * @return A reference to the underlying registry.
      */
-    const registry_type & registry() const noexcept {
-        return reg;
+    const registry_type & backend() const ENTT_NOEXCEPT {
+        return *reg;
+    }
+
+    /*! @copydoc backend */
+    registry_type & backend() ENTT_NOEXCEPT {
+        return const_cast<registry_type &>(std::as_const(*this).backend());
     }
 
     /**
-     * @brief Returns a reference to the underlying registry.
-     * @return A reference to the underlying registry
+     * @brief Returns the entity associated with an actor.
+     * @return The entity associated with the actor.
      */
-    registry_type & registry() noexcept {
-        return const_cast<registry_type &>(const_cast<const Actor *>(this)->registry());
+    entity_type entity() const ENTT_NOEXCEPT {
+        return entt;
     }
 
     /**
-     * @brief Updates an actor, whatever it means to update it.
-     * @param delta Elapsed time.
+     * @brief Checks if an actor refers to a valid entity or not.
+     * @return True if the actor refers to a valid entity, false otherwise.
      */
-    virtual void update(delta_type delta) = 0;
+    explicit operator bool() const ENTT_NOEXCEPT {
+        return reg && reg->valid(entt);
+    }
 
 private:
-    registry_type &reg;
-    Entity entity;
+    registry_type *reg;
+    entity_type entt;
 };
-
-
-/**
- * @brief Default actor class.
- *
- * The default actor is the best choice for almost all the applications.<br/>
- * Users should have a really good reason to choose something different.
- *
- * @tparam Delta Type to use to provide elapsed time.
- */
-template<typename Delta>
-using DefaultActor = Actor<DefaultRegistry::entity_type, Delta>;
 
 
 }

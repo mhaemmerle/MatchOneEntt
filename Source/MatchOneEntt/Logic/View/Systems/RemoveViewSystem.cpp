@@ -2,20 +2,15 @@
 #include "Components/ViewComponent.h"
 #include "Components/DestroyedComponent.h"
 
-void RemoveViewSystem::Initialize(entt::DefaultRegistry &Registry)
-{
-    Registry.prepare<ViewComponent, DestroyedComponent>();
-}
+void RemoveViewSystem::Initialize(entt::registry& Registry) {}
 
-void RemoveViewSystem::Update(entt::DefaultRegistry &Registry)
+void RemoveViewSystem::Update(entt::registry& Registry)
 {
-    auto View = Registry.persistent<ViewComponent, DestroyedComponent>();
-
-    //    return HasView(entity);
+    auto View = Registry.view<ViewComponent, DestroyedComponent>();
 
     for (auto Entity : View)
     {
-        auto &ViewComp = View.get<ViewComponent>(Entity);
+        auto& ViewComp = View.get<ViewComponent>(Entity);
         ViewComp.Value->Destroy();
 
         //var gameObject = viewComponent.gameObject;

@@ -9,8 +9,9 @@ public:
     auto Add(std::shared_ptr<System> system)->Feature*;
     template <typename T> inline auto Add()->Feature*;
 
-    virtual void Initialize(entt::DefaultRegistry &Registry) override;
-    virtual void Update(entt::DefaultRegistry &Registry) override;
+    virtual void Initialize(entt::registry& Registry) override;
+    virtual void Update(entt::registry& Registry) override;
+    virtual void Teardown(entt::registry& Registry) override;
 
 protected:
     std::vector<std::shared_ptr<System>> Systems;

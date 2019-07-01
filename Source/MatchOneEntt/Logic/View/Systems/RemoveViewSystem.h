@@ -5,6 +5,6 @@
 class RemoveViewSystem : public System
 {
 public:
-    virtual void Initialize(entt::DefaultRegistry &Registry) override;
-    virtual void Update(entt::DefaultRegistry &Registry) override;
+    virtual void Initialize(entt::registry& Registry) override;
+    virtual void Update(entt::registry& Registry) override;
 };

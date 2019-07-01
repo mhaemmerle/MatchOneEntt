@@ -14,7 +14,7 @@
 class GameBoardLogic
 {
 public:
-    static int GetNextEmptyRow(entt::DefaultRegistry &Registry, FIntVector Position)
+    static int GetNextEmptyRow(entt::registry& Registry, FIntVector Position)
     {
         Position.Y -= 1;
 
@@ -26,7 +26,7 @@ public:
         return Position.Y + 1;
     }
 
-    static uint32_t CreateRandomPiece(entt::DefaultRegistry &Registry, int X, int Y)
+    static entt::entity CreateRandomPiece(entt::registry& Registry, int X, int Y)
     {
         auto Entity = Registry.create();
         Registry.assign<GameBoardElementComponent>(Entity);
@@ -52,7 +52,7 @@ public:
         return Entity;
     }
 
-    static uint32_t CreateBlocker(entt::DefaultRegistry &Registry, int X, int Y)
+    static entt::entity CreateBlocker(entt::registry& Registry, int X, int Y)
     {
         auto Entity = Registry.create();
         Registry.assign<GameBoardElementComponent>(Entity);
@@ -64,7 +64,7 @@ public:
         return Entity;
     }
 
-    static bool GameBoardPositionEmpty(entt::DefaultRegistry &Registry, FIntVector Position)
+    static bool GameBoardPositionEmpty(entt::registry& Registry, FIntVector Position)
     {
         auto View = Registry.view<PositionComponent>();
 
