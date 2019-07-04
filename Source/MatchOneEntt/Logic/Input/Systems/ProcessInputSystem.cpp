@@ -24,10 +24,7 @@ void ProcessInputSystem::Update(entt::registry& Registry)
 
             if (Position.Value == InputPosition)
             {
-                if (Registry.has<DestroyedComponent>(PositionEntity) == false)
-                {
-                    Registry.assign<DestroyedComponent>(PositionEntity);
-                }
+                Registry.assign_or_replace<DestroyedComponent>(PositionEntity);
             }
         }
 

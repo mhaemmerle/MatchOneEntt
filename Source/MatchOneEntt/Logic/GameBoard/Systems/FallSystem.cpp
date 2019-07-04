@@ -1,5 +1,6 @@
 #include "FallSystem.h"
-#include "Components/FallEventComponent.h"
+#include "Components/DestroyedComponent.h"
+#include "Components/GameBoardElementComponent.h"
 #include "Components/GameBoardComponent.h"
 #include "Components/PositionComponent.h"
 #include "Components/MovableComponent.h"
@@ -7,44 +8,56 @@
 #include "Logic/GameBoard/GameBoardLogic.h"
 #include "Data/Comparator.h"
 
-void FallSystem::Initialize(entt::registry& Registry) {}
+void FallSystem::Initialize(entt::registry& Registry)
+{
+    auto Collector = entt::collector.group<DestroyedComponent>().where<GameBoardElementComponent>();
+    Observer = MakeUnique<entt::observer>(Registry, Collector);
+}
 
 void FallSystem::Update(entt::registry& Registry)
 {
-    auto View = Registry.view<FallEventComponent>();
+    if (Observer->size() == 0)
+    {
+        return;
+    }
 
-    if (View.size() > 0)
+    for (const auto Entity : *Observer)
     {
         auto& GameBoard = Registry.ctx<GameBoardComponent>();
 
-        for (auto Entity : View)
+        for (int Column = 0; Column < GameBoard.Columns; Column++)
         {
-            for (int Column = 0; Column < GameBoard.Columns; Column++)
+            for (int Row = 1; Row < GameBoard.Rows; Row++)
             {
-                for (int Row = 1; Row < GameBoard.Rows; Row++)
+                auto CurrentPosition = FIntVector(Column, Row, 0);
+                auto PositionView = Registry.view<PositionComponent, MovableComponent>();
+
+                for (auto PositionEntity : PositionView)
                 {
-                    auto CurrentPosition = FIntVector(Column, Row, 0);
-                    auto PositionView = Registry.view<PositionComponent, MovableComponent>();
+                    auto& Position = PositionView.get<PositionComponent>(PositionEntity);
 
-                    for (auto PositionEntity : PositionView)
+                    if (Position.Value == CurrentPosition)
                     {
-                        auto Position = PositionView.get<PositionComponent>(PositionEntity);
+                        auto NextRowPosition = GameBoardLogic::GetNextEmptyRow(Registry, CurrentPosition);
 
-                        if (Position.Value == CurrentPosition)
+                        if (NextRowPosition != Position.Value.Y)
                         {
-                            auto NextRowPosition = GameBoardLogic::GetNextEmptyRow(Registry, CurrentPosition);
+                            Registry.replace<PositionComponent>(PositionEntity, FIntVector(CurrentPosition.X, NextRowPosition, 0));
+                            Registry.assign_or_replace<PositionUpdatedComponent>(PositionEntity);
 
-                            if (NextRowPosition != Position.Value.Y)
-                            {
-                                Registry.replace<PositionComponent>(PositionEntity, FIntVector(CurrentPosition.X, NextRowPosition, 0));
-                                Registry.assign_or_replace<PositionUpdatedComponent>(PositionEntity);
-                            }
+                            break;
                         }
                     }
                 }
             }
-
-            Registry.destroy(Entity);
         }
     }
+
+    Observer->clear();
+}
+
+void FallSystem::Teardown(entt::registry& Registry)
+{
+    Observer->clear();
+    Observer->disconnect();
 }

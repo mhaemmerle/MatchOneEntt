@@ -5,8 +5,6 @@
 #include "Components/GameBoardElementComponent.h"
 #include "Components/PositionComponent.h"
 #include "Components/DestroyedComponent.h"
-#include "Components/FillEventComponent.h"
-#include "Components/FallEventComponent.h"
 
 void GameBoardSystem::Initialize(entt::registry& Registry)
 {
@@ -14,19 +12,19 @@ void GameBoardSystem::Initialize(entt::registry& Registry)
 
     auto& GameBoard = Registry.ctx<GameBoardComponent>();
 
-    for (int row = 0; row < GameBoard.Rows; row++)
+    for (int Row = 0; Row < GameBoard.Rows; Row++)
     {
-        for (int column = 0; column < GameBoard.Columns; column++)
+        for (int Column = 0; Column < GameBoard.Columns; Column++)
         {
-            float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+            float Rand = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
-            if (r > 0.91f)
+            if (Rand > 0.91f)
             {
-                GameBoardLogic::CreateBlocker(Registry, column, row);
+                GameBoardLogic::CreateBlocker(Registry, Column, Row);
             }
             else
             {
-                GameBoardLogic::CreateRandomPiece(Registry, column, row);
+                GameBoardLogic::CreateRandomPiece(Registry, Column, Row);
             }
         }
     }

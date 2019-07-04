@@ -113,7 +113,7 @@ void AMatchOneEnttPlayerController::CheckHit()
             auto Location = GamePiece->GetActorLocation();
 
             auto Entity = Registry->create();
-            Registry->assign<UserInputComponent>(Entity, int(Location.Y / 125.0f), int(Location.Z / 125.0f));
+            Registry->assign<UserInputComponent>(Entity, int(Location.Y / 125.f), int(Location.Z / 125.f));
         }
     }
 }

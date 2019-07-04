@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CoreMinimal.h"
 #include "Extension/System.h"
 
 class GameBoardSystem : public System

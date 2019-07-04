@@ -9,6 +9,7 @@
 #include "Components/MovableComponent.h"
 #include "Components/PositionUpdatedComponent.h"
 #include "Components/AddViewComponent.h"
+#include "Components/DestroyedComponent.h"
 #include "Data/Comparator.h"
 
 class GameBoardLogic
@@ -64,13 +65,14 @@ public:
         return Entity;
     }
 
+private:
     static bool GameBoardPositionEmpty(entt::registry& Registry, FIntVector Position)
     {
-        auto View = Registry.view<PositionComponent>();
+        auto Group = Registry.group<>(entt::get<PositionComponent, GameBoardElementComponent>, entt::exclude<DestroyedComponent>);
 
-        for (auto Entity : View)
+        for (auto Entity : Group)
         {
-            if (Registry.get<PositionComponent>(Entity).Value == Position)
+            if (Group.get<PositionComponent>(Entity).Value == Position)
             {
                 return false;
             }
