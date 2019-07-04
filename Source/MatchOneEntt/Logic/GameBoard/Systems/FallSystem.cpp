@@ -4,7 +4,6 @@
 #include "Components/GameBoardComponent.h"
 #include "Components/PositionComponent.h"
 #include "Components/MovableComponent.h"
-#include "Components/PositionUpdatedComponent.h"
 #include "Logic/GameBoard/GameBoardLogic.h"
 #include "Data/Comparator.h"
 
@@ -43,7 +42,6 @@ void FallSystem::Update(entt::registry& Registry)
                         if (NextRowPosition != Position.Value.Y)
                         {
                             Registry.replace<PositionComponent>(PositionEntity, FIntVector(CurrentPosition.X, NextRowPosition, 0));
-                            Registry.assign_or_replace<PositionUpdatedComponent>(PositionEntity);
 
                             break;
                         }

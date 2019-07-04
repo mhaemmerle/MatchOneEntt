@@ -7,7 +7,6 @@
 #include "Components/GameBoardElementComponent.h"
 #include "Components/InteractiveComponent.h"
 #include "Components/MovableComponent.h"
-#include "Components/PositionUpdatedComponent.h"
 #include "Components/AddViewComponent.h"
 #include "Components/DestroyedComponent.h"
 #include "Data/Comparator.h"
@@ -47,7 +46,6 @@ public:
 
         Registry.assign<PositionComponent>(Entity, FIntVector(X, Y, 0));
         Registry.assign<AssetComponent>(Entity, pieces[randomIndex]);
-        Registry.assign<PositionUpdatedComponent>(Entity);
         Registry.assign<AddViewComponent>(Entity);
 
         return Entity;
@@ -59,7 +57,6 @@ public:
         Registry.assign<GameBoardElementComponent>(Entity);
         Registry.assign<PositionComponent>(Entity, FIntVector(X, Y, 0));
         Registry.assign<AssetComponent>(Entity, FName(TEXT("Blocker")));
-        Registry.assign<PositionUpdatedComponent>(Entity);
         Registry.assign<AddViewComponent>(Entity);
 
         return Entity;
