@@ -6,7 +6,7 @@
 class Feature : public System
 {
 public:
-    auto Add(std::shared_ptr<System> system)->Feature*;
+    auto Add(TSharedPtr<System> InSystem)->Feature*;
     template <typename T> inline auto Add()->Feature*;
 
     virtual void Initialize(entt::registry& Registry) override;
@@ -14,11 +14,11 @@ public:
     virtual void Teardown(entt::registry& Registry) override;
 
 protected:
-    std::vector<std::shared_ptr<System>> Systems;
+    TArray<TSharedPtr<System>> Systems;
 };
 
 template <typename T>
 auto Feature::Add() -> Feature*
 {
-    return Add(std::shared_ptr<T>(new T()));
+    return Add(MakeShared<T>());
 }

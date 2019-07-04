@@ -3,5 +3,5 @@
 
 InputSystems::InputSystems()
 {
-    Add(std::make_shared<ProcessInputSystem>());
+    Add(MakeShared<ProcessInputSystem>());
 }

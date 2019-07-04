@@ -7,9 +7,9 @@
 
 GameSystems::GameSystems()
 {
-    Add(std::make_shared<InputSystems>());
-    Add(std::make_shared<GameBoardSystems>());
-    Add(std::make_shared<GameStateSystems>());
-    Add(std::make_shared<ViewSystems>());
-    Add(std::make_shared<DestroySystem>());
+    Add(MakeShared<InputSystems>());
+    Add(MakeShared<GameBoardSystems>());
+    Add(MakeShared<GameStateSystems>());
+    Add(MakeShared<ViewSystems>());
+    Add(MakeShared<DestroySystem>());
 }

@@ -1,8 +1,8 @@
 #include "Feature.h"
 
-auto Feature::Add(std::shared_ptr<System> System) -> Feature*
+auto Feature::Add(TSharedPtr<System> InSystem)->Feature*
 {
-    Systems.push_back(System);
+    Systems.Add(InSystem);
 
     return this;
 }

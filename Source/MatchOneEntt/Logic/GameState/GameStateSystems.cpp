@@ -4,6 +4,6 @@
 
 GameStateSystems::GameStateSystems()
 {
-    Add(std::make_shared<ScoreSystem>());
-    Add(std::make_shared<ScoreListenerSystem>());
+    Add(MakeShared<ScoreSystem>());
+    Add(MakeShared<ScoreListenerSystem>());
 }

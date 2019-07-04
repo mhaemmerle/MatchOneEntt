@@ -5,7 +5,7 @@
 
 GameBoardSystems::GameBoardSystems()
 {
-    Add(std::make_shared<GameBoardSystem>());
-    Add(std::make_shared<FallSystem>());
-    Add(std::make_shared<FillSystem>());
+    Add(MakeShared<GameBoardSystem>());
+    Add(MakeShared<FallSystem>());
+    Add(MakeShared<FillSystem>());
 }

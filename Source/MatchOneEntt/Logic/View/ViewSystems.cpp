@@ -6,8 +6,8 @@
 
 ViewSystems::ViewSystems()
 {
-    Add(std::make_shared<RemoveViewSystem>());
-    Add(std::make_shared<AddViewSystem>());
-    Add(std::make_shared<SetViewPositionSystem>());
-    Add(std::make_shared<AnimatePositionSystem>());
+    Add(MakeShared<RemoveViewSystem>());
+    Add(MakeShared<AddViewSystem>());
+    Add(MakeShared<SetViewPositionSystem>());
+    Add(MakeShared<AnimatePositionSystem>());
 }

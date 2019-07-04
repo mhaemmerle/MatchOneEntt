@@ -33,7 +33,7 @@ public:
         Registry.assign<InteractiveComponent>(Entity);
         Registry.assign<MovableComponent>(Entity);
 
-        std::vector<FName> pieces = {
+        TArray<FName> Pieces = {
             FName(TEXT("Piece0")),
             FName(TEXT("Piece1")),
             FName(TEXT("Piece2")),
@@ -42,10 +42,10 @@ public:
             FName(TEXT("Piece5"))
         };
 
-        int randomIndex = rand() % pieces.size();
+        int RandomIndex = rand() % Pieces.Num();
 
         Registry.assign<PositionComponent>(Entity, FIntVector(X, Y, 0));
-        Registry.assign<AssetComponent>(Entity, pieces[randomIndex]);
+        Registry.assign<AssetComponent>(Entity, Pieces[RandomIndex]);
         Registry.assign<AddViewComponent>(Entity);
 
         return Entity;
