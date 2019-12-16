@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Extension/System.h"
-#include "entt.hpp"
+#include "EnttWrapper.h"
 
 class ScoreListenerSystem : public System
 {
