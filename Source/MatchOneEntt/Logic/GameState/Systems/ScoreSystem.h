@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Extension/System.h"
-#include "entt.hpp"
+#include "EnttWrapper.h"
 
 class ScoreSystem : public System
 {

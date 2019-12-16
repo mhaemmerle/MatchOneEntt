@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MatchOneEntt.h"
-#include "entt.hpp"
+#include "EnttWrapper.h"
 
 struct ScoreEntityId
 {
