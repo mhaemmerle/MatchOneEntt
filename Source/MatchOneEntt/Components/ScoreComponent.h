@@ -1,8 +1,8 @@
 #pragma once
 
-#include "MatchOneEntt.h"
+#include "CoreMinimal.h"
 
 struct ScoreComponent
 {
-    int Value;
+    int32 Value;
 };

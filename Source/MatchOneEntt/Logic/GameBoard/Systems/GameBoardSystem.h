@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "Extension/System.h"
 
-class GameBoardSystem : public System
+class GameBoardSystem final : public System
 {
 public:
     virtual void Initialize(entt::registry& Registry) override;

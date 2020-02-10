@@ -8,6 +8,13 @@ public class MatchOneEntt : ModuleRules
     {
         //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+        if (Target.Configuration != UnrealTargetConfiguration.Shipping)
+        {
+            bFasterWithoutUnity = true;
+        }
+
+        bEnforceIWYU = true;
+
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Paper2D" });
         PrivateDependencyModuleNames.AddRange(new string[] { });
 

@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "Extension/System.h"
 
-class AnimatePositionSystem : public System
+class AnimatePositionSystem final : public System
 {
 public:
     virtual void Initialize(entt::registry& Registry) override;

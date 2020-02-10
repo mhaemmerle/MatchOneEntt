@@ -2,7 +2,7 @@
 
 #include "Extension/Feature.h"
 
-class InputSystems : public Feature
+class InputSystems final : public Feature
 {
 public:
     InputSystems();

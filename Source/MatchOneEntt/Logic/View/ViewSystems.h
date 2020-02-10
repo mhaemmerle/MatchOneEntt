@@ -2,7 +2,7 @@
 
 #include "Extension/Feature.h"
 
-class ViewSystems : public Feature
+class ViewSystems final : public Feature
 {
 public:
     ViewSystems();

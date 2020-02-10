@@ -2,7 +2,7 @@
 
 #include "Extension/Feature.h"
 
-class GameSystems : public Feature
+class GameSystems final : public Feature
 {
 public:
     GameSystems();

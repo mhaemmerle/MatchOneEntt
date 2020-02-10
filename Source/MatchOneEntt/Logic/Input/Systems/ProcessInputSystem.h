@@ -2,7 +2,7 @@
 
 #include "Extension/System.h"
 
-class ProcessInputSystem : public System
+class ProcessInputSystem final : public System
 {
 public:
     virtual void Initialize(entt::registry& Registry) override;

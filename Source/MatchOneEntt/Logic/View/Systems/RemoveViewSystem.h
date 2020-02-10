@@ -2,7 +2,7 @@
 
 #include "Extension/System.h"
 
-class RemoveViewSystem : public System
+class RemoveViewSystem final : public System
 {
 public:
     virtual void Initialize(entt::registry& Registry) override;

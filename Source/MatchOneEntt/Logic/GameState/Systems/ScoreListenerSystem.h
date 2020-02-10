@@ -4,7 +4,7 @@
 #include "Extension/System.h"
 #include "entt.hpp"
 
-class ScoreListenerSystem : public System
+class ScoreListenerSystem final : public System
 {
 public:
     virtual void Initialize(entt::registry& Registry) override;

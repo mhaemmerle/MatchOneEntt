@@ -2,7 +2,7 @@
 
 #include "Extension/System.h"
 
-class AddViewSystem : public System
+class AddViewSystem final : public System
 {
 public:
     virtual void Update(entt::registry& Registry) override;

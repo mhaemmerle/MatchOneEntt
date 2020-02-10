@@ -1,9 +1,9 @@
 #pragma once
 
-#include "MatchOneEntt.h"
+#include "CoreMinimal.h"
 
 struct UserInputComponent
 {
-    int X;
-    int Y;
+    int32 X;
+    int32 Y;
 };

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "MatchOneEntt.h"
+#include "CoreMinimal.h"
 
 struct GameBoardComponent
 {
-    int Columns;
-    int Rows;
+    int32 Columns;
+    int32 Rows;
 };

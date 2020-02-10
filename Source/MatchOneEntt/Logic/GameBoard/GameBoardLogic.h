@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CoreMinimal.h"
 #include "entt.hpp"
 #include "Components/GameBoardComponent.h"
 #include "Components/PositionComponent.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Feature.h"
+#include "CoreMinimal.h"
 #include "System.h"
 
 class Feature : public System
